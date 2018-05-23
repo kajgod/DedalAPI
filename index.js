@@ -18,7 +18,6 @@ fs.readdirSync(__dirname+'/nasi_moduli').forEach(function(file) {
         moduli[path.basename(file, '.js')]=require("./nasi_moduli/" + file);
     }
 });
-console.log(moduli);
 //#endregion
 
 //#region postavljanje porta servera
@@ -49,20 +48,36 @@ app.use(function (req, res, next) {
 //#endregion
 
 /************************* ROUTING ****************************/
-app.all('/', function(req, res){
-	res.send(true);
-});
 
+//#region root vraća shemu cijelog apija
+app.all('/', function(req, res){
+    var shema={};
+    console.log(moduli);
+	for(i in moduli){
+        shema[i]=moduli[i]['get']();
+        console.log('?');
+    }
+    console.log(shema);
+    res.json(shema);
+});
+//#endregion
+
+//#region otvara module
 app.all('/:api', function(req, res){
     var projekt=req.params.api;
     var parametri=req.body;
-    console.log(req.method);
+    var metoda=req.method.toLowerCase();
     if (moduli.hasOwnProperty(projekt)) {
-        res.send('?');
+        if(moduli[projekt].hasOwnProperty(metoda)){
+            res.json(moduli[projekt][metoda](parametri));
+        }else{
+            res.json({"error":"2", "modul":projekt, "metoda":metoda});
+        }
     }else{
         res.json({"error":"1"});
     }
 });
+//#endregion
 
 /************************** DOKUMENTACIJA **********************/
 /**************************
@@ -77,4 +92,5 @@ app.all('/:api', function(req, res){
 /**************************
  * B) ERROR CODEOVI:
  * 1 - ne postoji traženi projekt npr. /projekt-koji-ne-postoji
+ * 2 - za modul nije definirana metoda (mogu se projekt i metoda pročitati iz jsona)
  **************************/

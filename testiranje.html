@@ -7,14 +7,14 @@
         <script>
         $(function(){
             $.ajax({
-                url: "http://localhost:8080/test",
-                method: "post",
+                url: "https://dedal-api.appspot.com/",
+                method: "get",
                 data: {
                     "ime": "Ovo je ime projekta",
                     "prezime": "Ovo je prezime projekta"
                 }
             }).then(function(data){
-                $("#exe").html(JSON.stringify(data));
+                $("#exe").html(JSON.stringify(data, null, 2));
             });
         });
         </script>

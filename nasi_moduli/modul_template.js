@@ -23,16 +23,16 @@ function get() {
     };
 }
 
-function post(parametri) {
-    return 'krema';
+function post() {
+    return {};
 }
 
-function put(parametri) {
-    
+function put() {
+    return {};
 }
 
-function deleteMe(parametri) {
-    
+function deleteMe() {
+    return {};
 }
 
 module.exports.get = get;

@@ -12,7 +12,7 @@ const io = require('socket.io')(http);
 //#endregion
 
 //#region 1st party moduli by vajz esis
-var moduli={};
+let moduli={};
 fs.readdirSync(__dirname+'/nasi_moduli').forEach(function(file) {
     if(path.extname(file)=='.js'){
         moduli[path.basename(file, '.js')]=require("./nasi_moduli/" + file);
@@ -51,22 +51,19 @@ app.use(function (req, res, next) {
 
 //#region root vraća shemu cijelog apija
 app.all('/', function(req, res){
-    var shema={};
-    console.log(moduli);
+    let shema={};
 	for(i in moduli){
         shema[i]=moduli[i]['get']();
-        console.log('?');
     }
-    console.log(shema);
     res.json(shema);
 });
 //#endregion
 
 //#region otvara module
 app.all('/:api', function(req, res){
-    var projekt=req.params.api;
-    var parametri=req.body;
-    var metoda=req.method.toLowerCase();
+    let projekt=req.params.api;
+    let parametri=req.body;
+    let metoda=req.method.toLowerCase();
     if (moduli.hasOwnProperty(projekt)) {
         if(moduli[projekt].hasOwnProperty(metoda)){
             res.json(moduli[projekt][metoda](parametri));
@@ -77,6 +74,18 @@ app.all('/:api', function(req, res){
         res.json({"error":"1"});
     }
 });
+//#endregion
+
+/***************************** SOCKET ************************/
+//#region socket otvaranje
+global.socketIo = {};
+for(i in moduli){
+    let projekt=i;
+    global.socketIo[projekt] = io.of('/'+projekt);
+    global.socketIo[projekt].on('connection', function(socket){
+        console.log('Otvoren socket za projekt: ' + projekt);
+    });
+}
 //#endregion
 
 /************************** DOKUMENTACIJA **********************/
@@ -93,4 +102,11 @@ app.all('/:api', function(req, res){
  * B) ERROR CODEOVI:
  * 1 - ne postoji traženi projekt npr. /projekt-koji-ne-postoji
  * 2 - za modul nije definirana metoda (mogu se projekt i metoda pročitati iz jsona)
+ * ************************/
+/**************************
+ * C) SOCKET:
+ * klijent se treba spojiti na URL/imeprojekta
+ * npr. const socket = io.('https://dedal-api.appspot.com/ime-projekta');
+ * onda se socket može primati u obliku 
+ * socket.on('poruka', function(poruka){obradaPoruka(poruka);});
  **************************/

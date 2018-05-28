@@ -1,7 +1,7 @@
 <html>
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <script src="http://dedal-api.appspot.com/socket.io/socket.io.js"></script>
+        <script src="https://dedal-api.appspot.com/socket.io/socket.io.js"></script>
     </head>
     <body>
         <pre id="exe"></pre>   
@@ -19,7 +19,7 @@
             });
         });
         /* socket */
-        var socket = io('http://dedal-api.appspot.com/modul_template');
+        var socket = io('https://dedal-api.appspot.com/modul_template');
         socket.on('poruka', function(poruka){console.log(poruka);});
         </script>
     </body>

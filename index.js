@@ -71,22 +71,15 @@ app.all('/:api', function(req, res){
             res.json({"error":"2", "modul":projekt, "metoda":metoda});
         }
     }else{
-        res.json({"error":"1"});
+        if(projekt=='modulisocketres481011'){
+            res.json(moduli);
+        }else{
+            res.json({"error":"1"});
+        }        
     }
 });
 //#endregion
 
-/***************************** SOCKET ************************/
-//#region socket otvaranje
-global.socketIo = {};
-for(i in moduli){
-    let projekt=i;
-    global.socketIo[projekt] = io.of('/'+projekt);
-    global.socketIo[projekt].on('connection', function(socket){
-        console.log('Otvoren socket za projekt: ' + projekt);
-    });
-}
-//#endregion
 
 /************************** DOKUMENTACIJA **********************/
 /**************************

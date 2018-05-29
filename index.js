@@ -3,14 +3,15 @@
 //#region 3rd party moduli
 const express=require('express');
 const app = express();
-const http = require('http').Server(app);
+const httpovi = require('http');
+const http=httpovi.Server(app);
 const bodyParser = require('body-parser');
 const io = require('socket.io')(http);
 //#endregion
 
 //#region postavljanje porta servera
-http.listen(8080, function(){
-    console.log('Aktiviran HTTP to Socket server na portu 8080');
+http.listen(8081, function(){
+    console.log('Aktiviran HTTP to Socket server na portu 8081');
   });
 //#endregion
 
@@ -40,17 +41,41 @@ app.use(function (req, res, next) {
 app.get('/', function(req, res){
     res.json({poslano:req.params});
 });
+app.all('/:poruka', function(req, res){
+    let projekt=req.params.poruka;
+    let parametri=req.body;
+    posaljiPoruku(projekt, parametri);
+});
 //#endregion
 
 
 /***************************** SOCKET ************************/
 //#region socket otvaranje
-global.socketIo = {};
-for(i in moduli){
-    let projekt=i;
-    global.socketIo[projekt] = io.of('/'+projekt);
-    global.socketIo[projekt].on('connection', function(socket){
-        console.log('Otvoren socket za projekt: ' + projekt);
-    });
+/* prvo uzimamo popis modula sa API stranice */
+httpovi.get('http://localhost:8080', (resp) => {
+  let data = '';
+  resp.on('data', (chunk) => {
+    data += chunk;
+  });
+  resp.on('end', () => {
+    otvoriSockete(JSON.parse(data));
+  }); 
+}).on("error", (err) => {
+  console.log("Greška u čitanju sa API servisa (http.get): " + err.message);
+});
+/* onda otvaramo sockete u skladu s tim */
+socket = {};
+function otvoriSockete(moduli){
+    for(i in moduli){
+        let projekt=i;
+        socket[projekt] = io.of('/'+projekt);
+        socket[projekt].on('connection', function(socket){
+            console.log('Otvoren socket za projekt: ' + projekt);
+        });
+    }
+}
+/* server je spreman, prosljeđujemo rikvestove */
+function posaljiPoruku(projekt, parametri){
+    socket[projekt].emit('poruka', parametri);
 }
 //#endregion

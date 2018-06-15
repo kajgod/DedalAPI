@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="http://localhost:8081/socket.io/socket.io.js"></script>
+    </head>
+    <body>
+        <pre id="exe"></pre>   
+        <script>
+        $(function(){
+            $.ajax({
+                url: "http://localhost:8080/modul_template",
+                method: "get",
+                data: {
+                    "ime": "Ovo je ime projekta",
+                    "prezime": "Ovo je prezime projekta"
+                }
+            }).then(function(data){
+                $("#exe").html(JSON.stringify(data, null, 2));
+            });
+        });
+        /* socket */
+        var socket = io('http://localhost:8081/modul_template2');
+        socket.on('poruka', function(poruka){console.log(poruka);});
+        </script>
+    </body>
+</html>

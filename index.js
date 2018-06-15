@@ -9,9 +9,14 @@ const bodyParser = require('body-parser');
 const io = require('socket.io')(http);
 //#endregion
 
+//#region 1st party moduli
+const konfiguracija = require("./tajno/conf.js");
+//#endregion
+
 //#region postavljanje porta servera
-http.listen(8081, function(){
-    console.log('Aktiviran HTTP to Socket server na portu 8081');
+console.log(konfiguracija.port);
+http.listen(konfiguracija.port, function(){
+    console.log('Aktiviran HTTP to Socket server na portu '+konfiguracija.port);
   });
 //#endregion
 
@@ -45,6 +50,7 @@ app.all('/:poruka', function(req, res){
     let projekt=req.params.poruka;
     let parametri=req.body;
     posaljiPoruku(projekt, parametri);
+    res.json(true);
 });
 //#endregion
 
@@ -52,7 +58,7 @@ app.all('/:poruka', function(req, res){
 /***************************** SOCKET ************************/
 //#region socket otvaranje
 /* prvo uzimamo popis modula sa API stranice */
-httpovi.get('http://localhost:8080', (resp) => {
+httpovi.get(konfiguracija.api+'/modulisocketres481011', (resp) => {
   let data = '';
   resp.on('data', (chunk) => {
     data += chunk;
